@@ -1,0 +1,11 @@
+StatsCommand
+SearchAnime
+ManualUpdate
+UserSearchCommand
+Recent
+AddAnime
+SteamGameLookup
+Closer
+Kirby
+AniListAuth
+ListCommands

@@ -1,0 +1,51 @@
+{
+	"stats": {
+		"class": "StatsCommand",
+		"description": "Display user stats"
+	},
+	"-s": {
+		"class": "SearchAnime",
+		"description": "searches for anime"
+	},
+	"-ulist": {
+		"class": "ManualUpdate",
+		"description": "Checks for updates to add to the list"
+	},
+	"-su": {
+		"class": "UserSearchCommand",
+		"description": "Searches for a user"
+	},
+	"recent": {
+		"class": "Recent",
+		"description": "Shows recently finished anime"
+	},
+	"-w": {
+		"class": "AddAnime",
+		"description": "adds anime to watched list"
+	},
+	"-l": {
+		"class": "SteamGameLookup",
+		"description": "Looks up steam games"
+	},
+	"closer": {
+		"class": "Closer",
+		"description": "Closes everything"
+	},
+	"<(^-^)>": {
+		"class": "Kirby",
+		"description": "oooo kirby"
+	},
+	"features": {
+		"class": "ListCommands",
+		"description": "Lists all available commands"
+	},
+
+	"token": {
+		"class": "AniListAuth",
+		"description": "fetches your auth token"
+	},
+	
+	
+	
+	"Transform": "AWS::Serverless-2016-10-31"
+}
