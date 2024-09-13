@@ -24,7 +24,12 @@ def terminate_process_from_pid():
     if pid_file.exists():
         try:
             with open(pid_file, 'r') as f:
-                pid = int(f.read().strip())
+                pid_content = f.read().strip()
+                if not pid_content:  # Check if pid.txt is empty
+                    print("No process found, continuing with update checks")
+                    return
+                pid = int(pid_content)
+                
             if is_process_running(pid):
                 process = psutil.Process(pid)
                 process.terminate()  # Gracefully terminate the process
@@ -52,9 +57,17 @@ def terminate_process_from_pid():
 def fetch_remote_files():
     url = f"{GITHUB_API_URL}/repos/{REPO_OWNER}/{REPO_NAME}/commits"
     response = requests.get(url)
-    response.raise_for_status()  # Ensure no error in fetching
+    if response.status_code == 404:
+        print("Loader-Senpai wasn't found")
+        return []
+    response.raise_for_status()  # Ensure no other error in fetching
 
-    latest_commit = response.json()[0]
+    commits = response.json()
+    if not commits:
+        print("Loader-Senpai wasn't found")
+        return []
+
+    latest_commit = commits[0]
     tree_url = latest_commit['commit']['tree']['url'] + "?recursive=1"
     tree_response = requests.get(tree_url)
     tree_response.raise_for_status()
@@ -66,12 +79,19 @@ def fetch_remote_files():
 def download_file_content(remote_file_path):
     raw_url = f"https://raw.githubusercontent.com/{REPO_OWNER}/{REPO_NAME}/main/{remote_file_path}"
     response = requests.get(raw_url)
+    if response.status_code == 404:
+        print("Loader-Senpai wasn't found")
+        return None
     response.raise_for_status()
     return response.content
 
 # Main update function
 def update_repo():
     remote_files = fetch_remote_files()
+    if not remote_files:
+        # Loader-Senpai wasn't found, exit the function
+        return
+
     added_files = 0  # Track the number of added files
     updated_files = 0  # Track the number of updated files
 
@@ -86,6 +106,8 @@ def update_repo():
 
             # Download the remote file content
             remote_file_content = download_file_content(remote_file_path)
+            if remote_file_content is None:
+                continue  # Loader-Senpai wasn't found, skip this file
 
             # Check if the local file exists
             if local_file_path.exists():
