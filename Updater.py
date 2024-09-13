@@ -12,7 +12,7 @@ REPO_NAME = "Loader-senpai"
 CURRENT_DIR = Path.cwd()
 
 # List of files to ignore if they exist locally
-FILES_TO_IGNORE = ["token.txt", "username.txt", "watched_anime.txt", "closeall.config"]
+FILES_TO_IGNORE = ["token.txt", "username.txt", "watched_anime.txt", "closeall.config", "pid.txt"]
 
 # Function to check if a process with a given PID is running using psutil
 def is_process_running(pid):
