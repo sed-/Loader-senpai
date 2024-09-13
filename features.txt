@@ -9,3 +9,4 @@ Closer
 Kirby
 AniListAuth
 ListCommands
+Compare

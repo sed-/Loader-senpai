@@ -175,8 +175,9 @@ class AddAnime:
         # List of all possible list files
         list_files = ['currently_watching.txt', 'on_hold.txt', 'dropped.txt', 'plan_to_watch.txt']
 
-        # Remove current list file from the list of files to check
-        list_files.remove(current_list_file)
+        # Check if the current_list_file is in the list before removing it
+        if current_list_file in list_files:
+            list_files.remove(current_list_file)
 
         # Normalize the anime name for comparison
         anime_entry_clean = f"{self.anime_name}".strip().lower()

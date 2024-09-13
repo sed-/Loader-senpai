@@ -13,7 +13,7 @@
 	},
 	"-su": {
 		"class": "UserSearchCommand",
-		"description": "Searches for a user. Example use: -su name"
+		"description": "Searches for a user stats. Example use: -su anilistname"
 	},
 	"recent": {
 		"class": "Recent",
@@ -21,15 +21,15 @@
 	},
 	"-w": {
 		"class": "AddAnime",
-		"description": "adds anime to any list. (completed, dropped, ect) Example use: -w name"
+		"description": "adds anime to any list (completed, dropped, ect). Example use: -w noragami"
 	},
 	"-l": {
 		"class": "SteamGameLookup",
-		"description": "Looks up steam games. example use: -l name"
+		"description": "Looks up steam games. Example use: -l gamename"
 	},
 	"closer": {
 		"class": "Closer",
-		"description": "Closes everything. edit closeall config file to add stuff to it."
+		"description": "Closes everything. edit closer config file to add programs to it."
 	},
 	"<(^-^)>": {
 		"class": "Kirby",
@@ -43,6 +43,11 @@
 	"token": {
 		"class": "AniListAuth",
 		"description": "fetches your auth token"
+	},
+
+	"-c": {
+		"class": "Compare",
+		"description": "Compares your list with another. Example use: -c anilistname"
 	},
 	
 	
