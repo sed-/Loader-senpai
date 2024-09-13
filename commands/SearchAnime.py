@@ -12,7 +12,6 @@ class SearchAnime:
         self.api_url = api_url
         self.anime_title = anime_title
         self.headers = self.get_headers()
-        self.watched_anime = self.load_watched_anime()
 
     @staticmethod
     def get_api_token():
@@ -36,17 +35,48 @@ class SearchAnime:
             print("No token available.")
             return {}
 
-    def load_watched_anime(self):
-        """Load the watched anime list from a file and process titles for accurate matching."""
+    @staticmethod
+    def is_anime_in_file(anime_title, filename):
+        """Check if the anime title is present in the given file."""
         try:
-            with open('watched_anime.txt', 'r') as file:
-                return [line.strip().lower() for line in file.readlines()]
+            anime_title_normalized = anime_title.lower().strip()
+            with open(filename, 'r', encoding='utf-8') as file:
+                for line in file:
+                    # Split each line by the colon or other delimiter, and only compare the first part (the title)
+                    title_part = line.split(':')[0].strip().lower()  # Extract the title part and normalize
+                    if anime_title_normalized == title_part:
+                        return True
+            return False
         except FileNotFoundError:
-            print("Watched anime list file not found. Please ensure the file exists and is in the correct location.")
-            return []
+            return False
+
+    def get_watched_status(self, anime_title):
+        """Determine the watched status of an anime by checking each status file."""
+        anime_title = anime_title.lower().strip()  # Normalize the anime title
+
+        # Check the files for the anime title
+        if self.is_anime_in_file(anime_title, 'currently_watching.txt'):
+            return "Currently watching"
+        elif self.is_anime_in_file(anime_title, 'on_hold.txt'):
+            return "On hold"
+        elif self.is_anime_in_file(anime_title, 'dropped.txt'):
+            return "Dropped"
+        elif self.is_anime_in_file(anime_title, 'plan_to_watch.txt'):
+            return "Plan to watch"
+        else:
+            return "Not Seen"
+
+    def is_watched(self, anime_title):
+        """Check if an anime has been watched by checking all status files."""
+        return any([
+            self.is_anime_in_file(anime_title, 'currently_watching.txt'),
+            self.is_anime_in_file(anime_title, 'on_hold.txt'),
+            self.is_anime_in_file(anime_title, 'dropped.txt'),
+            self.is_anime_in_file(anime_title, 'plan_to_watch.txt'),
+            self.is_anime_in_file(anime_title, 'watched_anime.txt')
+        ])
 
     def execute(self):
-        #print(f"Searching for Anime: {self.anime_title} at URL: {self.api_url}")
         self.search_anime()
 
     def search_anime(self):
@@ -105,7 +135,7 @@ class SearchAnime:
         anime_status = anime.get('status', 'N/A').replace('_', ' ').title()  # Format status
         genres = ', '.join(anime.get('genres', []))
         site_url = anime['siteUrl']
-        watched_status = "Seen" if anime_title.lower() in self.watched_anime else "Not Seen"
+        watched_status = self.get_watched_status(anime_title)
 
         # Print the details in the desired format with colors
         print(f"{Fore.RED}N{Fore.LIGHTBLACK_EX}ame{Fore.WHITE}: {Style.BRIGHT}{Fore.LIGHTWHITE_EX}/{Fore.LIGHTCYAN_EX}{anime_title}{Fore.LIGHTWHITE_EX}/{Fore.MAGENTA}{year}{Fore.LIGHTWHITE_EX}/{Fore.CYAN}{average_score}%{Fore.LIGHTWHITE_EX}/")
@@ -118,7 +148,7 @@ class SearchAnime:
         recommendations = anime.get('recommendations', {}).get('edges', [])
         unwatched_recommendations = [
             rec['node']['mediaRecommendation'] for rec in recommendations
-            if rec['node']['mediaRecommendation']['title']['romaji'].lower() not in self.watched_anime
+            if not self.is_watched(rec['node']['mediaRecommendation']['title']['romaji'].lower())
             and rec['node']['mediaRecommendation'].get('averageScore', 0) >= 65
         ]
 

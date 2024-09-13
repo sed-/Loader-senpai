@@ -5,6 +5,33 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
+# cd part of the code
+def braaafile(filename, search_path="."):
+    
+    for root, dirs, files in os.walk(search_path):
+        if filename in files:
+            return os.path.join(root, filename)
+    return None
+
+try:
+    
+    filename = '1.Loader-Senpai.py'
+    file_path = braaafile(filename)
+
+    if file_path:
+        directory = os.path.dirname(file_path)
+
+        os.chdir(directory)
+
+        print(f"File : {file_path} found ≧◡≦.")
+        #print(f"Changed directory to {os.getcwd()}")
+    else:
+        print("File not found. ༼ ﹏ ༽")
+except Exception as e:
+    print(f"An error occurred: {e} (˃̣̣̥⌓˂̣̣̥ )")
+
+#cd part  ends here 
+
 # Define the API URL at the beginning of your script
 API_URL = "https://graphql.anilist.co"
 

@@ -1,9 +1,10 @@
+import os
 import requests
 
 class ManualUpdate:
-    requires_api = True  # Indicates this command needs the API URL
-    requires_parameter = False  # Indicates this command does not require a parameter
-    requires_username = True  # Indicates this command requires a username
+    requires_api = True
+    requires_parameter = False
+    requires_username = True
 
     def __init__(self, api_url, username=None):
         if not username:
@@ -17,7 +18,6 @@ class ManualUpdate:
 
     @staticmethod
     def get_username_from_file():
-        """Read the username from a file."""
         try:
             with open('username.txt', 'r') as file:
                 return file.read().strip()
@@ -27,7 +27,6 @@ class ManualUpdate:
 
     @staticmethod
     def get_api_token():
-        """Read the API token from a file."""
         try:
             with open('token.txt', 'r') as file:
                 return file.read().strip()
@@ -36,7 +35,6 @@ class ManualUpdate:
             return None
 
     def get_headers(self):
-        """Construct headers for the HTTP request."""
         token = self.get_api_token()
         return {
             'Authorization': f'Bearer {token}',
@@ -45,7 +43,6 @@ class ManualUpdate:
         }
 
     def load_existing_titles(self):
-        """Load existing anime titles from file for comparison."""
         try:
             with open('watched_anime.txt', 'r', encoding='utf-8') as file:
                 return set(file.read().splitlines())
@@ -54,7 +51,6 @@ class ManualUpdate:
             return set()
 
     def execute(self):
-        """Execute the update process by querying the API and updating the list."""
         query = """
         query ($userName: String) {
             MediaListCollection(userName: $userName, type: ANIME) {
@@ -79,31 +75,75 @@ class ManualUpdate:
             print("Failed to fetch data from API.")
 
     def process_response(self, json_response):
-        """Process the API response and update the title list."""
         if 'data' in json_response:
-            new_titles = []
+            categorized_titles = {
+                'CURRENTLY_WATCHING': [],
+                'ON_HOLD': [],
+                'DROPPED': [],
+                'PLAN_TO_WATCH': [],
+                'COMPLETED': []
+            }
             lists = json_response['data']['MediaListCollection']['lists']
             for list in lists:
                 for entry in list['entries']:
-                    if entry['status'] == 'COMPLETED':
-                        title = entry['media']['title']['romaji']
-                        if title not in self.existing_titles:
-                            new_titles.append(title)
+                    status = entry['status']
+                    title = entry['media']['title']['romaji']
 
-            self.update_titles(new_titles)
+                    if status == 'CURRENT':
+                        categorized_titles['CURRENTLY_WATCHING'].append(title)
+                    elif status == 'PLANNING':
+                        categorized_titles['PLAN_TO_WATCH'].append(title)
+                    elif status == 'PAUSED':
+                        categorized_titles['ON_HOLD'].append(title)
+                    elif status == 'DROPPED':
+                        categorized_titles['DROPPED'].append(title)
+                    elif status == 'COMPLETED':
+                        categorized_titles['COMPLETED'].append(title)
+
+            self.update_titles(categorized_titles)
         else:
             print("No useful data in response.")
 
-    def update_titles(self, new_titles):
-        """Update the watched_anime.txt file with new titles."""
-        if new_titles:
-            with open('watched_anime.txt', 'a', encoding='utf-8') as file:
-                added_animes = 0
-                for title in new_titles:
-                    file.write(f"{title}\n")
-                    added_animes += 1
-            print(f"Added {added_animes} new animes. Check 'watched_anime.txt' for the updated list.")
-        else:
-            print("No new animes to add.")
+    def update_titles(self, categorized_titles):
+        file_mapping = {
+            'CURRENTLY_WATCHING': 'currently_watching.txt',
+            'ON_HOLD': 'on_hold.txt',
+            'DROPPED': 'dropped.txt',
+            'PLAN_TO_WATCH': 'plan_to_watch.txt',
+            'COMPLETED': 'watched_anime.txt'
+        }
 
+        files_created = 0
+        files_updated = 0
+        total_animes_added = 0
 
+        for category, titles in categorized_titles.items():
+            file_name = file_mapping[category]
+            titles_set = set(titles)  # Converting to set for easier comparison
+
+            if os.path.exists(file_name):
+                with open(file_name, 'r', encoding='utf-8') as file:
+                    current_titles = set(file.read().splitlines())
+            else:
+                current_titles = set()
+
+            # Only update if there are changes
+            if titles_set != current_titles:
+                with open(file_name, 'w', encoding='utf-8') as file:
+                    for title in titles:
+                        file.write(f"{title}\n")
+                if len(current_titles) == 0:
+                    files_created += 1
+                    print(f"Created {file_name}")
+                else:
+                    files_updated += 1
+                    print(f"Updated {file_name}")
+
+                added_animes = len(titles_set - current_titles)
+                total_animes_added += added_animes
+
+                if added_animes > 0:
+                    print(f"Added {added_animes} anime(s) to {file_name}: {', '.join(titles_set - current_titles)}")
+        # Print "Everything is up to date" only if no updates were made
+        if files_updated == 0 and files_created == 0:
+            print("Everything is up to date")
