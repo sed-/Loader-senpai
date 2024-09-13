@@ -3,3 +3,4 @@ requests
 psutil
 keyboard
 lxml
+requests
