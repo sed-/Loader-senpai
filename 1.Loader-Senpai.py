@@ -24,13 +24,12 @@ try:
         os.chdir(directory)
 
         print(f"File : {file_path} found ≧◡≦.")
-        #print(f"Changed directory to {os.getcwd()}")
     else:
         print("File not found. ༼ ﹏ ༽")
 except Exception as e:
     print(f"An error occurred: {e} (˃̣̣̥⌓˂̣̣̥ )")
 
-#cd part  ends here 
+#cd part ends here 
 
 # Define the API URL at the beginning of your script
 API_URL = "https://graphql.anilist.co"
@@ -88,10 +87,18 @@ def check_watched_anime(username):
                 raise ValueError("watched_anime.txt is empty.")
             return True  # Watched anime list is present
     except (FileNotFoundError, ValueError):
-        # Notify the user to put their token and run -ulist command
         print(f"{Fore.LIGHTBLACK_EX}Loader{Fore.WHITE}-{Fore.LIGHTYELLOW_EX}senpai{Fore.WHITE}: {Fore.LIGHTCYAN_EX}Hey {Fore.LIGHTGREEN_EX}{username}{Fore.WHITE}, {Fore.LIGHTCYAN_EX}your watched anime list is empty!{Fore.WHITE}")
         print(f"{Fore.LIGHTBLACK_EX}Loader{Fore.WHITE}-{Fore.LIGHTYELLOW_EX}senpai{Fore.WHITE}: {Fore.LIGHTCYAN_EX}Please put your token in token.txt and run the {Fore.LIGHTGREEN_EX}-ulist{Fore.LIGHTCYAN_EX} command to update your watched list.")
         return False  # Watched anime list is not present
+
+# Function to check if dropped.txt exists
+def check_dropped_file():
+    try:
+        with open("dropped.txt", "r") as file:
+            return True  # dropped.txt exists
+    except FileNotFoundError:
+        print(f"{Fore.LIGHTBLACK_EX}Loader{Fore.WHITE}-{Fore.LIGHTYELLOW_EX}senpai{Fore.WHITE}: {Fore.LIGHTCYAN_EX}I noticed you're missing some files. Please type {Fore.LIGHTGREEN_EX}-ulist{Fore.LIGHTCYAN_EX} to get the missing files.")
+        return False  # dropped.txt not present
 
 if __name__ == "__main__":
     # Get the username from the file or ask the user
@@ -102,6 +109,9 @@ if __name__ == "__main__":
 
     # Check the watched_anime.txt file and prompt the user if it's empty
     watched_anime_present = check_watched_anime(username)
+
+    # Check if dropped.txt is present, if not, prompt the user
+    dropped_file_present = check_dropped_file()
 
     # Create an instance of CommandFactory with the necessary API URL
     factory = CommandFactory(api_url=API_URL)

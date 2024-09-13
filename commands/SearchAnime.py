@@ -43,7 +43,9 @@ class SearchAnime:
                 for line in file:
                     title_part = line.split(':')[0].strip().lower()
                     if anime_title_normalized == title_part:
+                        #print(f"Found match in {filename}: {title_part}")
                         return True
+            #print(f"No match found in {filename} for: {anime_title_normalized}")
             return False
         except FileNotFoundError:
             return False
@@ -59,6 +61,8 @@ class SearchAnime:
             return "Dropped"
         elif self.is_anime_in_file(anime_title, 'plan_to_watch.txt'):
             return "Plan to watch"
+        elif self.is_anime_in_file(anime_title, 'watched_anime.txt'):
+            return "Watched"
         else:
             return "Not Seen"
 
