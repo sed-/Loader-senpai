@@ -5,7 +5,7 @@ from colorama import Fore, Style, init
 init(autoreset=True)
 
 class SearchAnime:
-    requires_api = True  # Added attribute to indicate API requirement
+    requires_api = True
     requires_parameter = True
 
     def __init__(self, api_url, anime_title):
@@ -37,13 +37,11 @@ class SearchAnime:
 
     @staticmethod
     def is_anime_in_file(anime_title, filename):
-        """Check if the anime title is present in the given file."""
         try:
             anime_title_normalized = anime_title.lower().strip()
             with open(filename, 'r', encoding='utf-8') as file:
                 for line in file:
-                    # Split each line by the colon or other delimiter, and only compare the first part (the title)
-                    title_part = line.split(':')[0].strip().lower()  # Extract the title part and normalize
+                    title_part = line.split(':')[0].strip().lower()
                     if anime_title_normalized == title_part:
                         return True
             return False
@@ -51,10 +49,8 @@ class SearchAnime:
             return False
 
     def get_watched_status(self, anime_title):
-        """Determine the watched status of an anime by checking each status file."""
-        anime_title = anime_title.lower().strip()  # Normalize the anime title
+        anime_title = anime_title.lower().strip()
 
-        # Check the files for the anime title
         if self.is_anime_in_file(anime_title, 'currently_watching.txt'):
             return "Currently watching"
         elif self.is_anime_in_file(anime_title, 'on_hold.txt'):
@@ -67,7 +63,6 @@ class SearchAnime:
             return "Not Seen"
 
     def is_watched(self, anime_title):
-        """Check if an anime has been watched by checking all status files."""
         return any([
             self.is_anime_in_file(anime_title, 'currently_watching.txt'),
             self.is_anime_in_file(anime_title, 'on_hold.txt'),
@@ -119,25 +114,23 @@ class SearchAnime:
             data = response.json()
             media_list = data['data']['Page']['media']
             if media_list:
-                self.display_anime_details(media_list[0])  # Pass only the first anime
+                self.display_anime_details(media_list[0])
             else:
                 print("No results found.")
         else:
             print(f"Error searching for anime: {response.status_code}")
-            print(response.text)  # Print response text for debugging
+            print(response.text)
 
     def display_anime_details(self, anime):
-        """Print detailed information about the first anime, and filter/display recommendations."""
         anime_title = anime['title']['romaji']
         episodes = anime.get('episodes', 'N/A')
         year = anime.get('startDate', {}).get('year', 'Unknown')
         average_score = anime.get('averageScore', 'N/A')
-        anime_status = anime.get('status', 'N/A').replace('_', ' ').title()  # Format status
+        anime_status = anime.get('status', 'N/A').replace('_', ' ').title()
         genres = ', '.join(anime.get('genres', []))
         site_url = anime['siteUrl']
         watched_status = self.get_watched_status(anime_title)
 
-        # Print the details in the desired format with colors
         print(f"{Fore.RED}N{Fore.LIGHTBLACK_EX}ame{Fore.WHITE}: {Style.BRIGHT}{Fore.LIGHTWHITE_EX}/{Fore.LIGHTCYAN_EX}{anime_title}{Fore.LIGHTWHITE_EX}/{Fore.MAGENTA}{year}{Fore.LIGHTWHITE_EX}/{Fore.CYAN}{average_score}%{Fore.LIGHTWHITE_EX}/")
         print(f"{Fore.RED}E{Fore.LIGHTBLACK_EX}pisodes{Fore.WHITE}: {Style.BRIGHT}{Fore.CYAN}{episodes}")
         print(f"{Fore.RED}A{Fore.LIGHTBLACK_EX}nime Status{Fore.WHITE}: {Fore.GREEN if anime_status.lower() == 'finished' else Fore.RED}{anime_status}")
@@ -148,7 +141,8 @@ class SearchAnime:
         recommendations = anime.get('recommendations', {}).get('edges', [])
         unwatched_recommendations = [
             rec['node']['mediaRecommendation'] for rec in recommendations
-            if not self.is_watched(rec['node']['mediaRecommendation']['title']['romaji'].lower())
+            if rec['node']['mediaRecommendation'] and rec['node']['mediaRecommendation'].get('title')
+            and not self.is_watched(rec['node']['mediaRecommendation']['title'].get('romaji', '').lower())
             and rec['node']['mediaRecommendation'].get('averageScore', 0) >= 65
         ]
 
