@@ -1,46 +1,34 @@
----
-
- <h3>🌟Welcome to Loader-Senpai’s ReadMe!🌟</h3> 
-
-Ready to level up your anime experience? Loader-Senpai is here to help you manage, track, and explore your anime lists with ease. Let’s dive into some of the awesome features!
-
-<h2>🔥 Key Features 🔥</h2> 
-
-<h2>✨ Personalized Suggestions</h2> 
-
-Say goodbye to repeat recommendations! Loader-Senpai syncs with your profile to suggest only fresh anime picks—no more seeing shows you’ve already watched.
-
-<h2>📋 Effortless List Management</h2> 
-
-Keep all your anime lists (completed, on-hold, dropped, etc.) in one place. No need to juggle different apps—everything’s right here!
-
-<h2>👥 Compare with Friends</h2> 
-
-Ever wonder how your watchlist stacks up against your friends’? Compare lists to see what anime you’re missing out on, or find new recommendations to watch together.
-
-<h2>📊 Anime Stats—Yours & Theirs</h2> 
-
-Track your own anime stats or check out your friends’ progress.
-
-<h2>🎮 Steam Games Explorer</h2> 
-
-Also into gaming? You can search up steam games and see there current player count.
-
-<h2>🔒 Backup Your Lists</h2> 
-
-No more worries about losing track of your anime! Loader-Senpai can back up your lists, so you always have a safe copy.
-
-<h2>⚡ And So Much More!</h2> 
-
-These are just a few of the ways Loader-Senpai can make your anime and gaming adventures even better. Dive in and explore all it has to offer!
-
----
 
 ---
 
 ## 🌸 **Welcome to the Loader-Senpai AniList Integration Setup!** 🌸
 
-Whether you're a casual anime enthusiast or a seasoned otaku, Loader-Senpai is here to make your AniList experience seamless. Follow these simple steps, and you’ll be ready to manage your anime lists like a true senpai. However, please note that this is an **unstable build**, recommended for more experienced users. Proceed with caution, and feel free to unleash your creativity! 🎨
+- Whether you're a casual anime enthusiast or a seasoned otaku, Loader-Senpai is here to make your AniList experience seamless. 
+
+---
+
+Ready to level up your anime experience? Loader-Senpai is here to help you manage, track, and explore your anime lists with ease. Let’s dive into some of the awesome features!
+
+- **🔥 Key Features 🔥**
+  
+  - **✨ Personalized Suggestions:** Say goodbye to repeat recommendations! Loader-Senpai syncs with your profile to suggest only fresh anime picks—no more seeing shows you’ve already watched.
+  
+  - **📋 Effortless List Management:** Keep all your anime lists (completed, on-hold, dropped, etc.) in one place. No need to juggle different apps—everything’s right here!
+  
+  - **👥 Compare with Friends:** Ever wonder how your watchlist stacks up against your friends’? Compare lists to see what anime you’re missing out on, or find new recommendations to watch together.
+  
+  - **📊 Anime Stats—Yours & Theirs:** Track your own anime stats or check out your friends’ progress.
+  
+  - **🎮 Steam Games Explorer:** Also into gaming? You can search up steam games and see their current player count.
+  
+  - **🔒 Backup Your Lists:** No more worries about losing track of your anime! Loader-Senpai can back up your lists, so you always have a safe copy.
+  
+  - **⚡ And So Much More!** These are just a few of the ways Loader-Senpai can make your anime and gaming adventures even better. Dive in and explore all it has to offer!
+
+---
+
+- Follow these simple steps, and you’ll be ready to manage your anime lists like a true senpai.
+- Please note that this is an **unstable build**, recommended for more experienced users. Proceed with caution, and feel free to unleash your creativity! 🎨
 
 ---
 
