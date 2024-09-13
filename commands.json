@@ -5,7 +5,7 @@
 	},
 	"-s": {
 		"class": "SearchAnime",
-		"description": "searches for anime"
+		"description": "searches for anime. Example use: -s noragami"
 	},
 	"-ulist": {
 		"class": "ManualUpdate",
@@ -13,7 +13,7 @@
 	},
 	"-su": {
 		"class": "UserSearchCommand",
-		"description": "Searches for a user"
+		"description": "Searches for a user. Example use: -su name"
 	},
 	"recent": {
 		"class": "Recent",
@@ -21,15 +21,15 @@
 	},
 	"-w": {
 		"class": "AddAnime",
-		"description": "adds anime to watched list"
+		"description": "adds anime to any list. (completed, dropped, ect) Example use: -w name"
 	},
 	"-l": {
 		"class": "SteamGameLookup",
-		"description": "Looks up steam games"
+		"description": "Looks up steam games. example use: -l name"
 	},
 	"closer": {
 		"class": "Closer",
-		"description": "Closes everything"
+		"description": "Closes everything. edit closeall config file to add stuff to it."
 	},
 	"<(^-^)>": {
 		"class": "Kirby",
