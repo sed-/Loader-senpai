@@ -2,6 +2,7 @@ import requests
 import json
 import unicodedata
 from difflib import SequenceMatcher
+import os  # Import os to check for file existence
 
 class Compare:
     requires_api = True
@@ -66,8 +67,6 @@ class Compare:
         
         if response.status_code == 200:
             try:
-                # Print the raw API response for debugging
-                print("API Response:", json.dumps(response.json(), indent=4))  # Debug line
                 return response.json()
             except json.JSONDecodeError:
                 print("Failed to decode JSON from response.")
@@ -85,7 +84,7 @@ class Compare:
             return None
         else:
             print(f"Failed to fetch user stats for {username}: {response.status_code}")
-            print("Response content:", response.content)  # Debug line to see the raw response
+            print("Response content:", response.content)
             return None
 
     def _display_stats(self, media_list_collection):
@@ -95,13 +94,16 @@ class Compare:
         
         total_animes_watched = 0
         for anime_list in media_list_collection['lists']:
-            # Modified to check if the list name contains 'completed' (case-insensitive)
             if 'completed' in anime_list['name'].lower():
-                total_animes_watched += len(anime_list['entries'])  # Accumulate count for all completed lists
+                total_animes_watched += len(anime_list['entries'])
 
         print(f"Total Animes Watched: {total_animes_watched}")
 
     def compare_watched_list(self, media_list_collection):
+        # Ensure compare.txt exists
+        if not os.path.exists('compare.txt'):
+            open('compare.txt', 'w', encoding='utf-8').close()  # Create an empty compare.txt file
+
         if not media_list_collection or 'lists' not in media_list_collection:
             print("Media list collection is empty or malformed.")
             return
@@ -111,7 +113,6 @@ class Compare:
 
         completed_anime_romaji = []
         for anime_list in media_list_collection['lists']:
-            # Modified to check if the list name contains 'completed' (case-insensitive)
             if 'completed' in anime_list['name'].lower():
                 completed_anime_romaji.extend([entry['media']['title']['romaji'] for entry in anime_list['entries']])
 
@@ -132,16 +133,26 @@ class Compare:
             if not self.fuzzy_match(anime, normalized_user1_watched)
         ]
 
-        if difference_titles:
+        if len(difference_titles) >= 21:
+            user_input = input(f"{self.username} has {len(difference_titles)} animes you haven't seen. "
+                               "Do you want to dump the list to compare.txt? (yes/no): ").strip().lower()
+            if user_input == 'yes':
+                # Open file with utf-8 encoding
+                with open('compare.txt', 'w', encoding='utf-8') as file:
+                    file.write("\n".join(difference_titles))
+                print("compare.txt has been updated.")
+            else:
+                print(f"{self.username} has {len(difference_titles)} animes you haven't seen, here is the list:")
+                for title in difference_titles:
+                    print(f"- {title}")
+        else:
             print(f"{self.username} has {len(difference_titles)} animes you haven't seen, here is the list:")
             for title in difference_titles:
                 print(f"- {title}")
-        else:
-            print(f"No new anime found in {self.username}'s completed list that is not in user1's watched list.")
 
     def read_user1_watched_list(self):
         try:
-            with open('watched_anime.txt', 'r') as file:
+            with open('watched_anime.txt', 'r', encoding='utf-8') as file:
                 return [line.strip() for line in file.readlines()]
         except FileNotFoundError:
             print("watched_anime.txt file not found.")
@@ -150,14 +161,12 @@ class Compare:
     def normalize_string(self, title):
         title = unicodedata.normalize('NFKC', title)
         title = title.lower()
-        title = title.replace('×', 'x')  # Replace special "×" with "x"
+        title = title.replace('×', 'x')
         return ' '.join(title.split())
 
     def fuzzy_match(self, title, normalized_titles):
         normalized_title = self.normalize_string(title)
         for user1_title in normalized_titles:
-            # Debug line to print comparison attempts
-            #print(f"Comparing '{normalized_title}' with '{user1_title}'")
             if SequenceMatcher(None, normalized_title, user1_title).ratio() > 0.8:
                 return True
         return False
