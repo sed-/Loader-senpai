@@ -1,8 +1,8 @@
 import requests
 import json
 import unicodedata
-from difflib import SequenceMatcher
-import os  # Import os to check for file existence
+from rapidfuzz import process, fuzz  # Correct import for rapidfuzz
+import os
 
 class Compare:
     requires_api = True
@@ -12,7 +12,7 @@ class Compare:
         if not username:
             raise ValueError("Username is required for Compare.")
         self.api_url = api_url
-        self.username = username  # This is the user being searched
+        self.username = username
         self.headers = self.get_headers()
 
     @staticmethod
@@ -102,7 +102,7 @@ class Compare:
     def compare_watched_list(self, media_list_collection):
         # Ensure compare.txt exists
         if not os.path.exists('compare.txt'):
-            open('compare.txt', 'w', encoding='utf-8').close()  # Create an empty compare.txt file
+            open('compare.txt', 'w', encoding='utf-8').close()
 
         if not media_list_collection or 'lists' not in media_list_collection:
             print("Media list collection is empty or malformed.")
@@ -121,16 +121,17 @@ class Compare:
 
         print(f"Fetched {fetched_anime_count} completed anime.")
 
-        if fetched_anime_count == total_animes_watched:
-            print(f"Numbers match: {total_animes_watched} animes watched.")
-        else:
-            difference = total_animes_watched - fetched_anime_count
-            print(f"Difference in anime counts: {difference}. "
-                  f"Total reported: {total_animes_watched}, Fetched: {fetched_anime_count}.")
+        # Use the optimized set operations and fuzzy matching in all cases
+        # Convert completed_anime_romaji to a set for fast membership checking
+        completed_anime_set = {self.normalize_string(title) for title in completed_anime_romaji}
 
+        # Find differences using set difference
+        exact_difference_titles = list(completed_anime_set - normalized_user1_watched)
+
+        # Fuzzy match for titles that didn't match exactly
         difference_titles = [
-            anime for anime in completed_anime_romaji
-            if not self.fuzzy_match(anime, normalized_user1_watched)
+            title for title in exact_difference_titles
+            if not self.fuzzy_match(title, normalized_user1_watched)
         ]
 
         if len(difference_titles) >= 21:
@@ -165,8 +166,9 @@ class Compare:
         return ' '.join(title.split())
 
     def fuzzy_match(self, title, normalized_titles):
+        # Use rapidfuzz for fast fuzzy matching
         normalized_title = self.normalize_string(title)
-        for user1_title in normalized_titles:
-            if SequenceMatcher(None, normalized_title, user1_title).ratio() > 0.8:
-                return True
+        matches = process.extract(normalized_title, normalized_titles, limit=1, scorer=fuzz.ratio)
+        if matches and matches[0][1] > 80:  # Match found with a ratio greater than 80
+            return True
         return False

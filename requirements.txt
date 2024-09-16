@@ -4,4 +4,4 @@ psutil
 keyboard
 lxml
 requests
-setproctitle
+rapidfuzz
