@@ -147,7 +147,7 @@ class SearchAnime:
             rec['node']['mediaRecommendation'] for rec in recommendations
             if rec['node']['mediaRecommendation'] and rec['node']['mediaRecommendation'].get('title')
             and not self.is_watched(rec['node']['mediaRecommendation']['title'].get('romaji', '').lower())
-            and rec['node']['mediaRecommendation'].get('averageScore', 0) >= 65
+            and (rec['node']['mediaRecommendation'].get('averageScore') or 0) >= 65
         ]
 
         sorted_recommendations = sorted(unwatched_recommendations, key=lambda x: x.get('averageScore', 0), reverse=True)
