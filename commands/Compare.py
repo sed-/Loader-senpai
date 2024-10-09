@@ -56,6 +56,7 @@ class Compare:
                   title {
                     romaji
                   }
+                  genres
                 }
               }
             }
@@ -111,45 +112,61 @@ class Compare:
         user1_watched_titles = self.read_user1_watched_list()
         normalized_user1_watched = {self.normalize_string(title) for title in user1_watched_titles}
 
-        completed_anime_romaji = []
+        completed_anime = []
         for anime_list in media_list_collection['lists']:
             if 'completed' in anime_list['name'].lower():
-                completed_anime_romaji.extend([entry['media']['title']['romaji'] for entry in anime_list['entries']])
+                for entry in anime_list['entries']:
+                    completed_anime.append({
+                        'title': entry['media']['title']['romaji'],
+                        'genres': entry['media'].get('genres', [])
+                    })
 
-        fetched_anime_count = len(completed_anime_romaji)
-        total_animes_watched = fetched_anime_count
-
+        fetched_anime_count = len(completed_anime)
         print(f"Fetched {fetched_anime_count} completed anime.")
 
         # Use the optimized set operations and fuzzy matching in all cases
-        # Convert completed_anime_romaji to a set for fast membership checking
-        completed_anime_set = {self.normalize_string(title) for title in completed_anime_romaji}
+        completed_anime_set = {self.normalize_string(anime['title']) for anime in completed_anime}
 
         # Find differences using set difference
-        exact_difference_titles = list(completed_anime_set - normalized_user1_watched)
+        exact_difference_titles = [
+            anime for anime in completed_anime
+            if self.normalize_string(anime['title']) not in normalized_user1_watched
+        ]
 
         # Fuzzy match for titles that didn't match exactly
         difference_titles = [
-            title for title in exact_difference_titles
-            if not self.fuzzy_match(title, normalized_user1_watched)
+            anime for anime in exact_difference_titles
+            if not self.fuzzy_match(anime['title'], normalized_user1_watched)
         ]
 
         if len(difference_titles) >= 21:
             user_input = input(f"{self.username} has {len(difference_titles)} animes you haven't seen. "
                                "Do you want to dump the list to compare.txt? (yes/no): ").strip().lower()
             if user_input == 'yes':
-                # Open file with utf-8 encoding
+                # Organize by genre
+                genre_dict = {}
+                for anime in difference_titles:
+                    for genre in anime['genres']:
+                        if genre not in genre_dict:
+                            genre_dict[genre] = []
+                        genre_dict[genre].append(anime['title'])
+
+                # Write to compare.txt
                 with open('compare.txt', 'w', encoding='utf-8') as file:
-                    file.write("\n".join(difference_titles))
+                    for genre, titles in genre_dict.items():
+                        file.write(f"## {genre}\n")
+                        for title in titles:
+                            file.write(f"{title}\n")
+                        file.write("\n")
                 print("compare.txt has been updated.")
             else:
                 print(f"{self.username} has {len(difference_titles)} animes you haven't seen, here is the list:")
-                for title in difference_titles:
-                    print(f"- {title}")
+                for anime in difference_titles:
+                    print(f"- {anime['title']}")
         else:
             print(f"{self.username} has {len(difference_titles)} animes you haven't seen, here is the list:")
-            for title in difference_titles:
-                print(f"- {title}")
+            for anime in difference_titles:
+                print(f"- {anime['title']}")
 
     def read_user1_watched_list(self):
         try:
