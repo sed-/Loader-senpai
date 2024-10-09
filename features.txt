@@ -10,3 +10,4 @@ Kirby
 AniListAuth
 ListCommands
 Compare
+Time

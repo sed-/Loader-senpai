@@ -50,6 +50,11 @@
 		"description": "Compares your list with another. Example use: -c anilistname"
 	},
 	
+
+	"-twt": {
+		"class": "Time",
+		"description": "This lets you see total time it takes to watch an anime."
+	},
 	
 	
 	"Transform": "AWS::Serverless-2016-10-31"
