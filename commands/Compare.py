@@ -57,6 +57,7 @@ class Compare:
                     romaji
                   }
                   genres
+                  averageScore
                 }
               }
             }
@@ -118,7 +119,8 @@ class Compare:
                 for entry in anime_list['entries']:
                     completed_anime.append({
                         'title': entry['media']['title']['romaji'],
-                        'genres': entry['media'].get('genres', [])
+                        'genres': entry['media'].get('genres', []),
+                        'averageScore': entry['media'].get('averageScore', 'N/A')
                     })
 
         fetched_anime_count = len(completed_anime)
@@ -149,14 +151,16 @@ class Compare:
                     for genre in anime['genres']:
                         if genre not in genre_dict:
                             genre_dict[genre] = []
-                        genre_dict[genre].append(anime['title'])
+                        genre_dict[genre].append(anime)
 
                 # Write to compare.txt
                 with open('compare.txt', 'w', encoding='utf-8') as file:
-                    for genre, titles in genre_dict.items():
+                    for genre, animes in genre_dict.items():
                         file.write(f"## {genre}\n")
-                        for title in titles:
-                            file.write(f"{title}\n")
+                        # Sort animes by rating
+                        sorted_animes = sorted(animes, key=lambda x: x['averageScore'] if x['averageScore'] != 'N/A' else 0, reverse=True)
+                        for anime in sorted_animes:
+                            file.write(f"{anime['title']} {anime['averageScore']}%\n")
                         file.write("\n")
                 print("compare.txt has been updated.")
             else:
